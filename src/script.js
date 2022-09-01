@@ -20,12 +20,12 @@ const scene = new THREE.Scene();
  */
 
 //Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001);
 scene.add(ambientLight);
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
 directionalLight.position.set(2, 2, -1);
 gui.add(directionalLight, "intensity").min(0).max(1).step(0.001);
 gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
@@ -38,7 +38,7 @@ directionalLight.shadow.mapSize.width = 1024;
 directionalLight.shadow.mapSize.height = 1024;
 
 //optimizing the shadows
-//since the camera is orthographic
+//since the camera is orthographic(directional)
 //the smaller the values, the more precise the shadow is
 directionalLight.shadow.camera.top = 2;
 directionalLight.shadow.camera.right = 2;
@@ -62,7 +62,7 @@ scene.add(directionalLight, directionalLightHeight);
 //two shadows- directional light shadow and the spot light(perspective camera) shadow
 const spotLight = new THREE.SpotLight(
   0xffffff,
-  0.4,
+  0.3,
   10, //fading with the distance
   Math.PI * 0.3 //angle
 );
@@ -81,6 +81,21 @@ scene.add(spotLight, spotLight.target);
 const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera);
 spotLightCameraHelper.visible = false;
 scene.add(spotLightCameraHelper);
+
+//POINT LIGHT
+const pointLight = new THREE.PointLight(0xffffff, 0.3);
+pointLight.castShadow = true;
+
+pointLight.shadow.mapSize.width = 1024;
+pointLight.shadow.mapSize.height = 1024;
+pointLight.shadow.camera.near = 0.1;
+pointLight.shadow.camera.far = 5;
+
+pointLight.position.set(-1, 1, 0);
+
+const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera);
+pointLightCameraHelper.visible = false;
+scene.add(pointLight, pointLightCameraHelper);
 
 //materials
 const material = new THREE.MeshStandardMaterial();

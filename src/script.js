@@ -31,6 +31,28 @@ gui.add(directionalLight, "intensity").min(0).max(1).step(0.001);
 gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "y").min(-5).max(5).step(0.001);
 gui.add(directionalLight.position, "z").min(-5).max(5).step(0.001);
+
+directionalLight.castShadow = true;
+
+directionalLight.shadow.mapSize.width = 1024;
+directionalLight.shadow.mapSize.height = 1024;
+
+//optimizing the shadows
+//since the camera is orthographic
+//the smaller the values, the more precise the shadow is
+directionalLight.shadow.camera.top = 2;
+directionalLight.shadow.camera.right = 2;
+directionalLight.shadow.camera.left = -2;
+directionalLight.shadow.camera.bottom = -2;
+
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far = 6;
+
+const directionalLightHeight = new THREE.CameraHelper(
+  directionalLight.shadow.camera
+);
+
+// console.log(directionalLight);
 scene.add(directionalLight);
 
 //materials
@@ -42,10 +64,13 @@ gui.add(material, "roughness").min(0).max(1).step(0.001);
 // new THREE.Mesh(Geometry, material);
 // Objects
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
+sphere.castShadow = true;
 
 const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material);
 plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.5;
+
+plane.receiveShadow = true;
 
 scene.add(sphere, plane);
 /**
@@ -68,6 +93,9 @@ window.addEventListener("resize", () => {
   // Update renderer
   renderer.setSize(sizes.width, sizes.height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  //activating the shadow maps
+  renderer.shadowMap.enabled = true;
 });
 
 /**
@@ -97,6 +125,7 @@ const renderer = new THREE.WebGLRenderer({
 });
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
 
 /**
  * Animate

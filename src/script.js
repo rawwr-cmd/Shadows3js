@@ -20,12 +20,12 @@ const scene = new THREE.Scene();
  */
 
 //Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001);
 scene.add(ambientLight);
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
 directionalLight.position.set(2, 2, -1);
 gui.add(directionalLight, "intensity").min(0).max(1).step(0.001);
 gui.add(directionalLight.position, "x").min(-5).max(5).step(0.001);
@@ -48,12 +48,39 @@ directionalLight.shadow.camera.bottom = -2;
 directionalLight.shadow.camera.near = 1;
 directionalLight.shadow.camera.far = 6;
 
+// directionalLight.shadow.radius = 10;
+
 const directionalLightHeight = new THREE.CameraHelper(
   directionalLight.shadow.camera
 );
 
+directionalLightHeight.visible = false;
+
 // console.log(directionalLight);
-scene.add(directionalLight);
+scene.add(directionalLight, directionalLightHeight);
+
+//two shadows- directional light shadow and the spot light(perspective camera) shadow
+const spotLight = new THREE.SpotLight(
+  0xffffff,
+  0.4,
+  10, //fading with the distance
+  Math.PI * 0.3 //angle
+);
+
+spotLight.castShadow = true;
+spotLight.shadow.mapSize.width = 1024;
+spotLight.shadow.mapSize.height = 1024;
+
+spotLight.shadow.camera.fov = 30;
+spotLight.shadow.camera.near = 1;
+spotLight.shadow.camera.far = 6;
+
+spotLight.position.set(0, 2, 2);
+scene.add(spotLight, spotLight.target);
+
+const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera);
+spotLightCameraHelper.visible = false;
+scene.add(spotLightCameraHelper);
 
 //materials
 const material = new THREE.MeshStandardMaterial();
@@ -96,6 +123,8 @@ window.addEventListener("resize", () => {
 
   //activating the shadow maps
   renderer.shadowMap.enabled = true;
+  //shadow.radius doesn't work
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
 });
 
 /**

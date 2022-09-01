@@ -6,6 +6,8 @@ import * as dat from "dat.gui";
 /** texture loaders **/
 const textureLoader = new THREE.TextureLoader();
 const bakedShadow = textureLoader.load("/textures/bakedShadow.jpg");
+const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
+
 // console.log(bakedShadow);
 
 /**
@@ -115,7 +117,8 @@ sphere.castShadow = true;
 
 const plane = new THREE.Mesh(
   new THREE.PlaneGeometry(5, 5),
-  new THREE.MeshBasicMaterial({ map: bakedShadow })
+  // new THREE.MeshBasicMaterial({ map: bakedShadow })
+  material
 );
 plane.rotation.x = -Math.PI * 0.5;
 plane.position.y = -0.5;
@@ -123,6 +126,21 @@ plane.position.y = -0.5;
 plane.receiveShadow = true;
 
 scene.add(sphere, plane);
+
+//adding texture shadow
+const sphereShadow = new THREE.Mesh(
+  new THREE.PlaneBufferGeometry(1.5, 1.5),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    transparent: true,
+    alphaMap: simpleShadow,
+  })
+);
+
+sphereShadow.rotation.x = -Math.PI * 0.5;
+sphereShadow.position.y = plane.position.y + 0.01;
+scene.add(sphereShadow);
+
 /**
  * Sizes
  */
@@ -185,6 +203,17 @@ const clock = new THREE.Clock();
 
 const tick = () => {
   const elapsedTime = clock.getElapsedTime();
+
+  //updating the sphere position
+  sphere.position.x = Math.cos(elapsedTime) * 1.5;
+  sphere.position.z = Math.sin(elapsedTime) * 1.5;
+  sphere.position.y = Math.abs(Math.sin(elapsedTime * 3)); //for absolute function
+
+  //update the shadow
+  sphereShadow.position.x = sphere.position.x;
+  sphereShadow.position.z = sphere.position.z;
+  sphereShadow.material.opacity = (1 - sphere.position.y) * 0.7;
+  // console.log(sphereShadow);
 
   // Update controls
   controls.update();

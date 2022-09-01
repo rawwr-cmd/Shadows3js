@@ -7,8 +7,15 @@ import * as dat from "dat.gui";
 const textureLoader = new THREE.TextureLoader();
 const bakedShadow = textureLoader.load("/textures/bakedShadow.jpg");
 const simpleShadow = textureLoader.load("/textures/simpleShadow.jpg");
+const ballTexture = textureLoader.load("/textures/ballTexture.jpg");
+const basketBallTexture = textureLoader.load("/textures/basketBallTexture.jpg");
 
-// console.log(bakedShadow);
+// console.log(basketBallTexture);
+
+//min filter with nearestFilter doesn't need mipmaps
+basketBallTexture.generateMipmaps = true; // u can deactivate and activate filters
+// basketBallTexture.minFilter = THREE.NearestFilter;
+// basketBallTexture.magFilter = THREE.NearestFilter;
 
 /**
  * Base
@@ -112,7 +119,11 @@ gui.add(material, "roughness").min(0).max(1).step(0.001);
 
 // new THREE.Mesh(Geometry, material);
 // Objects
-const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material);
+
+const sphere = new THREE.Mesh(
+  new THREE.SphereGeometry(0.5, 32, 32),
+  new THREE.MeshBasicMaterial({ map: basketBallTexture })
+);
 sphere.castShadow = true;
 
 const plane = new THREE.Mesh(
